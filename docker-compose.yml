@@ -1,0 +1,41 @@
+version: "2"
+services:
+  app:
+    image: gitlab/gitlab-ce
+    restart: always
+    hostname: "whale-shark.local"
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url "http://whale-shark.local/gitlab"
+        gitlab_rails["backup_archive_permissions"] = 0644
+        gitlab_rails["backup_keep_time"] = 604800
+      TZ: "Japan"
+    ports:
+      - "10080:80"
+      - "10022:22"
+    volumes:
+      - ./gitlab/config:/etc/gitlab
+      - ./gitlab/logs:/var/log/gitlab
+      - ./gitlab/data:/var/opt/gitlab
+      - ./gitlab/backups:/var/opt/gitlab/backups
+    networks:
+      - default
+  runner:
+    image: gitlab/gitlab-runner
+    restart: always
+    hostname: "whale-shark.local"
+    volumes:
+      - ./gitlab_ci/runner:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+  nginx:
+    image: nginx:alpine
+    restart: always
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+      - /var/log/gitlab:/var/log/nginx
+    networks:
+      - default
+      - smart_network
+networks:
+  smart_network:
+    external: true
