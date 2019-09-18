@@ -9,10 +9,12 @@ services:
         external_url "http://whale-shark.local/gitlab"
         gitlab_rails["backup_archive_permissions"] = 0644
         gitlab_rails["backup_keep_time"] = 604800
+        registry_external_url 'http://whale-shark.local:5555'
       TZ: "Japan"
     ports:
       - "10080:80"
       - "10022:22"
+      - "5555:5555"
     volumes:
       - ./gitlab/config:/etc/gitlab
       - ./gitlab/logs:/var/log/gitlab
